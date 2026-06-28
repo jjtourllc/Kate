@@ -1,0 +1,2227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Kate's Game World</title>
+    <style>
+        :root {
+            --neon-pink: #ff2d95;
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --neon-yellow: #ffe600;
+            --neon-green: #39ff14;
+            --dark-bg: #0d0221;
+            --dark-card: #1a0533;
+            --text-primary: #ffffff;
+            --text-secondary: #b8a9d4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(188, 19, 254, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(188, 19, 254, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none; z-index: -1;
+            animation: gridFlow 4s linear infinite;
+        }
+        @keyframes gridFlow {
+            0% { background-position: 0 0, 0 0; }
+            100% { background-position: 50px 50px, 50px 50px; }
+        }
+        .particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: -1; overflow: hidden;
+        }
+        .particle {
+            position: absolute; border-radius: 50%;
+            animation: floatUp linear infinite; opacity: 0.6;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: -1;
+        }
+        .star {
+            position: absolute; width: 2px; height: 2px; background: white;
+            border-radius: 50%; animation: twinkle ease-in-out infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+        body::after {
+            content: '';
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px
+            );
+            pointer-events: none; z-index: 1000;
+        }
+        .nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13, 2, 33, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--neon-purple);
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
+            padding: 1rem 2rem;
+        }
+        .nav-container {
+            max-width: 1400px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .nav-logo {
+            font-size: 1.5rem; font-weight: bold;
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-blue));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(255, 45, 149, 0.5));
+        }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a {
+            color: var(--text-secondary); text-decoration: none;
+            transition: all 0.3s ease; font-weight: 500;
+        }
+        .nav-links a:hover {
+            color: var(--neon-blue); text-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+        }
+        .hero {
+            position: relative; padding: 3rem 2rem 2rem;
+            text-align: center; overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at center, rgba(188, 19, 254, 0.15) 0%, transparent 60%);
+            animation: heroPulse 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes heroPulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        .hero-title {
+            font-size: 3rem; font-weight: bold;
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(255, 45, 149, 0.6));
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(255, 45, 149, 0.6)); }
+            to { filter: drop-shadow(0 0 30px rgba(0, 243, 255, 0.8)); }
+        }
+        .hero-subtitle {
+            font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 1.5rem;
+        }
+        .search-bar {
+            max-width: 500px; margin: 0 auto 1.5rem; position: relative;
+        }
+        .search-bar input {
+            width: 100%; padding: 0.7rem 1.2rem 0.7rem 2.8rem;
+            background: var(--dark-card);
+            border: 2px solid rgba(188, 19, 254, 0.3);
+            border-radius: 25px; color: var(--text-primary);
+            font-size: 0.95rem; outline: none; transition: all 0.3s ease;
+        }
+        .search-bar input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+        .search-bar::before {
+            content: '🔍'; position: absolute; left: 1rem;
+            top: 50%; transform: translateY(-50%); font-size: 1rem;
+        }
+        .category-bar {
+            display: flex; flex-wrap: wrap; gap: 0.6rem;
+            justify-content: center; margin-bottom: 2rem;
+        }
+        .category-tag {
+            padding: 0.4rem 1rem;
+            background: var(--dark-card);
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            cursor: pointer; transition: all 0.3s ease;
+            font-size: 0.85rem; user-select: none;
+        }
+        .category-tag:hover, .category-tag.active {
+            border-color: var(--neon-blue); color: var(--neon-blue);
+            background: rgba(0, 243, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+        .games-section {
+            padding: 0 2rem 4rem; max-width: 1400px; margin: 0 auto;
+        }
+        .category-section {
+            margin-bottom: 3rem;
+            display: none;
+        }
+        .category-section.active {
+            display: flex;
+            flex-direction: column;
+        }
+        .category-header {
+            font-size: 1.5rem; font-weight: bold;
+            margin-bottom: 1rem; padding: 0.5rem 1rem;
+            border-left: 4px solid;
+            background: rgba(188, 19, 254, 0.1);
+            border-radius: 0 8px 8px 0;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.8rem;
+        }
+        .game-card {
+            background: var(--dark-card);
+            border: 2px solid rgba(188, 19, 254, 0.15);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex; flex-direction: column;
+            align-items: center;
+            padding: 0.8rem 0.4rem 0.7rem;
+        }
+        .game-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 8px 25px rgba(0, 243, 255, 0.25);
+        }
+        .game-card-icon {
+            width: 70px; height: 70px;
+            border-radius: 14px; margin-bottom: 0.6rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .game-card-title {
+            font-size: 0.78rem; font-weight: 600;
+            color: var(--text-primary);
+            text-align: center; line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .game-count {
+            color: var(--text-secondary); font-size: 0.9rem;
+            text-align: center; margin-bottom: 2rem;
+            animation: countGlow 2s ease-in-out infinite alternate;
+        }
+        @keyframes countGlow {
+            from { text-shadow: 0 0 5px rgba(0, 243, 255, 0.3); }
+            to { text-shadow: 0 0 15px rgba(188, 19, 254, 0.8); }
+        }
+        .footer {
+            background: rgba(13, 2, 33, 0.95);
+            border-top: 2px solid var(--neon-purple);
+            padding: 2rem; text-align: center; margin-top: 2rem;
+        }
+        .footer-text { color: var(--text-secondary); font-size: 0.85rem; }
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2rem; }
+            .hero { padding: 2rem 1rem 1.5rem; }
+            .games-section { padding: 0 1rem 3rem; }
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+                gap: 0.5rem;
+            }
+            .game-card-icon { width: 55px; height: 55px; font-size: 1.5rem; }
+            .game-card-title { font-size: 0.7rem; }
+            .nav-links { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-logo">Kate's Little World</div>
+            <ul class="nav-links">
+                <li><a href="#games">My Games</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1 class="hero-title">🌟 My Game World 🌟</h1>
+        <p class="hero-subtitle">Welcome to my cyberpunk universe! Choose a game and have fun!</p>
+        <p class="game-count">Total: 299 games</p>
+    </section>
+
+    <section id="games" class="games-section">
+        <div class="search-bar">
+            <input type="text" id="game-search" placeholder="Search games..." oninput="filterGames()">
+        </div>
+        <div class="category-bar">
+            <span class="category-tag active" onclick="filterCategory('popular', this)">🌟 Popular</span>
+            <span class="category-tag" onclick="filterCategory('runner', this)">🏃 Runner</span>
+            <span class="category-tag" onclick="filterCategory('sports', this)">🏅 Sports</span>
+            <span class="category-tag" onclick="filterCategory('racing', this)">🏎️ Racing</span>
+            <span class="category-tag" onclick="filterCategory('puzzle', this)">🧩 Puzzle</span>
+            <span class="category-tag" onclick="filterCategory('action', this)">⚔️ Action</span>
+            <span class="category-tag" onclick="filterCategory('simulation', this)">🏗️ Simulation</span>
+            <span class="category-tag" onclick="filterCategory('casual', this)">🎪 Casual</span>
+        </div>
+
+    <div class="category-section active" data-category="popular">
+<div class="games-grid">
+            <div class="game-card" data-category="popular" onclick="playGame('games/2048.html', '2048')">
+                <div class="game-card-icon">
+                    <img src="icons/2048.png" alt="2048" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">2048</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/2048cupcakes.html', '2048cupcakes')">
+                <div class="game-card-icon">
+                    <img src="icons/2048cupcakes.png" alt="2048cupcakes" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">2048cupcakes</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/amongus.html', 'amongus')">
+                <div class="game-card-icon">
+                    <img src="icons/amongus.png" alt="amongus" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">amongus</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/angrybirds.html', 'angrybirds')">
+                <div class="game-card-icon">
+                    <img src="icons/angrybirds.png" alt="angrybirds" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">angrybirds</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/angrybirdsshowdown.html', 'angrybirdsshowdown')">
+                <div class="game-card-icon">
+                    <img src="icons/angrybirdsshowdown.png" alt="angrybirdsshowdown" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">angrybirdsshowdown</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/angrybirdsspace.html', 'angrybirdsspace')">
+                <div class="game-card-icon">
+                    <img src="icons/angrybirdsspace.png" alt="angrybirdsspace" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">angrybirdsspace</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/backrooms.html', 'backrooms')">
+                <div class="game-card-icon">
+                    <img src="icons/backrooms.png" alt="backrooms" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">backrooms</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/cookieclicker.htm', 'cookieclicker')">
+                <div class="game-card-icon">
+                    <img src="icons/cookieclicker.png" alt="cookieclicker" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">cookieclicker</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/crossyroad.htm', 'crossyroad')">
+                <div class="game-card-icon">
+                    <img src="icons/crossyroad.png" alt="crossyroad" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">crossyroad</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/doodlejump.html', 'doodlejump')">
+                <div class="game-card-icon">
+                    <img src="icons/doodlejump.png" alt="doodlejump" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">doodlejump</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/drivemad.htm', 'drivemad')">
+                <div class="game-card-icon">
+                    <img src="icons/drivemad.png" alt="drivemad" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">drivemad</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/flappybird.html', 'flappybird')">
+                <div class="game-card-icon">
+                    <img src="icons/flappybird.png" alt="flappybird" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">flappybird</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/fruitninja.html', 'fruitninja')">
+                <div class="game-card-icon">
+                    <img src="icons/fruitninja.png" alt="fruitninja" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">fruitninja</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/geometrydash.html', 'geometrydash')">
+                <div class="game-card-icon">
+                    <img src="icons/geometrydash.png" alt="geometrydash" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">geometrydash</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/geometrydashlite.html', 'geometrydashlite')">
+                <div class="game-card-icon">
+                    <img src="icons/geometrydashlite.png" alt="geometrydashlite" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">geometrydashlite</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/googledino.html', 'googledino')">
+                <div class="game-card-icon">
+                    <img src="icons/googledino.png" alt="googledino" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">googledino</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/subwaysurfersbeijing.html', 'subwaysurfersbeijing')">
+                <div class="game-card-icon">
+                    <img src="icons/subwaysurfersbeijing.png" alt="subwaysurfersbeijing" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">subwaysurfersbeijing</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/subwaysurfershavana.html', 'subwaysurfershavana')">
+                <div class="game-card-icon">
+                    <img src="icons/subwaysurfershavana.png" alt="subwaysurfershavana" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">subwaysurfershavana</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/subwaysurferssanfrancisco.html', 'subwaysurferssanfrancisco')">
+                <div class="game-card-icon">
+                    <img src="icons/subwaysurferssanfrancisco.png" alt="subwaysurferssanfrancisco" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">subwaysurferssanfrancisco</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/templerun2.htm', 'templerun2')">
+                <div class="game-card-icon">
+                    <img src="icons/templerun2.png" alt="templerun2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">templerun2</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/vex4.html', 'vex4')">
+                <div class="game-card-icon">
+                    <img src="icons/vex4.png" alt="vex4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">vex4</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/vex5.html', 'vex5')">
+                <div class="game-card-icon">
+                    <img src="icons/vex5.png" alt="vex5" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">vex5</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/vex6.htm', 'vex6')">
+                <div class="game-card-icon">
+                    <img src="icons/vex6.png" alt="vex6" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">vex6</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/vex7.htm', 'vex7')">
+                <div class="game-card-icon">
+                    <img src="icons/vex7.png" alt="vex7" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">vex7</div>
+            </div>
+            <div class="game-card" data-category="popular" onclick="playGame('games/vex8.htm', 'vex8')">
+                <div class="game-card-icon">
+                    <img src="icons/vex8.png" alt="vex8" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">vex8</div>
+            </div>
+</div>
+</div>
+
+<div class="category-section" data-category="runner">
+<div class="games-grid">
+            <div class="game-card" data-category="runner" onclick="playGame('games/eagleride.html', 'eagleride')">
+                <div class="game-card-icon">
+                    <img src="icons/eagleride.png" alt="eagleride" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">eagleride</div>
+            </div>
+            <div class="game-card" data-category="runner" onclick="playGame('games/floodrunner2.html', 'floodrunner2')">
+                <div class="game-card-icon">
+                    <img src="icons/floodrunner2.png" alt="floodrunner2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">floodrunner2</div>
+            </div>
+            <div class="game-card" data-category="runner" onclick="playGame('games/floodrunner3.html', 'floodrunner3')">
+                <div class="game-card-icon">
+                    <img src="icons/floodrunner3.png" alt="floodrunner3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">floodrunner3</div>
+            </div>
+            <div class="game-card" data-category="runner" onclick="playGame('games/floodrunner4.html', 'floodrunner4')">
+                <div class="game-card-icon">
+                    <img src="icons/floodrunner4.png" alt="floodrunner4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">floodrunner4</div>
+            </div>
+            <div class="game-card" data-category="runner" onclick="playGame('games/templeofboom.html', 'templeofboom')">
+                <div class="game-card-icon">
+                    <img src="icons/templeofboom.png" alt="templeofboom" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">templeofboom</div>
+            </div>
+            <div class="game-card" data-category="runner" onclick="playGame('games/vexx3m.html', 'vexx3m')">
+                <div class="game-card-icon">
+                    <img src="icons/vexx3m.png" alt="vexx3m" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">vexx3m</div>
+            </div>
+            <div class="game-card" data-category="runner" onclick="playGame('games/vexx3m2.html', 'vexx3m2')">
+                <div class="game-card-icon">
+                    <img src="icons/vexx3m2.png" alt="vexx3m2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">vexx3m2</div>
+            </div>
+</div>
+</div>
+
+<div class="category-section" data-category="sports">
+<div class="games-grid">
+            <div class="game-card" data-category="sports" onclick="playGame('games/1on1soccer.html', '1on1soccer')">
+                <div class="game-card-icon">
+                    <img src="icons/1on1soccer.png" alt="1on1soccer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">1on1soccer</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/1on1tennis.html', '1on1tennis')">
+                <div class="game-card-icon">
+                    <img src="icons/1on1tennis.png" alt="1on1tennis" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">1on1tennis</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/baseballbros.html', 'baseballbros')">
+                <div class="game-card-icon">
+                    <img src="icons/baseballbros.png" alt="baseballbros" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">baseballbros</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/basketballlegends.html', 'basketballlegends')">
+                <div class="game-card-icon">
+                    <img src="icons/basketballlegends.png" alt="basketballlegends" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">basketballlegends</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/basketballstars.html', 'basketballstars')">
+                <div class="game-card-icon">
+                    <img src="icons/basketballstars.png" alt="basketballstars" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">basketballstars</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/basketbros.html', 'basketbros')">
+                <div class="game-card-icon">
+                    <img src="icons/basketbros.png" alt="basketbros" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">basketbros</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/basketrandom.html', 'basketrandom')">
+                <div class="game-card-icon">
+                    <img src="icons/basketrandom.png" alt="basketrandom" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">basketrandom</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/footballbros.html', 'footballbros')">
+                <div class="game-card-icon">
+                    <img src="icons/footballbros.png" alt="footballbros" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">footballbros</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/footballlegends.html', 'footballlegends')">
+                <div class="game-card-icon">
+                    <img src="icons/footballlegends.png" alt="footballlegends" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">footballlegends</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/googlebaseball.html', 'googlebaseball')">
+                <div class="game-card-icon">
+                    <img src="icons/googlebaseball.png" alt="googlebaseball" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">googlebaseball</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/pingpongchaos.html', 'pingpongchaos')">
+                <div class="game-card-icon">
+                    <img src="icons/pingpongchaos.png" alt="pingpongchaos" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">pingpongchaos</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/ragdollsoccer.html', 'ragdollsoccer')">
+                <div class="game-card-icon">
+                    <img src="icons/ragdollsoccer.png" alt="ragdollsoccer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ragdollsoccer</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/retropingpong.html', 'retropingpong')">
+                <div class="game-card-icon">
+                    <img src="icons/retropingpong.png" alt="retropingpong" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">retropingpong</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/rocketsoccerderby.html', 'rocketsoccerderby')">
+                <div class="game-card-icon">
+                    <img src="icons/rocketsoccerderby.png" alt="rocketsoccerderby" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">rocketsoccerderby</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/snowballio.html', 'snowballio')">
+                <div class="game-card-icon">
+                    <img src="icons/snowballio.png" alt="snowballio" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">snowballio</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/snowrider.htm', 'snowrider')">
+                <div class="game-card-icon">
+                    <img src="icons/snowrider.png" alt="snowrider" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">snowrider</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/snowroad.htm', 'snowroad')">
+                <div class="game-card-icon">
+                    <img src="icons/snowroad.png" alt="snowroad" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">snowroad</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/soccerbros.html', 'soccerbros')">
+                <div class="game-card-icon">
+                    <img src="icons/soccerbros.png" alt="soccerbros" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">soccerbros</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/soccerrandom.htm', 'soccerrandom')">
+                <div class="game-card-icon">
+                    <img src="icons/soccerrandom.png" alt="soccerrandom" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">soccerrandom</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/superliquidsoccer.html', 'superliquidsoccer')">
+                <div class="game-card-icon">
+                    <img src="icons/superliquidsoccer.png" alt="superliquidsoccer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">superliquidsoccer</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/tabletennisworldtour.html', 'tabletennisworldtour')">
+                <div class="game-card-icon">
+                    <img src="icons/tabletennisworldtour.png" alt="tabletennisworldtour" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">tabletennisworldtour</div>
+            </div>
+            <div class="game-card" data-category="sports" onclick="playGame('games/wrestlebros.html', 'wrestlebros')">
+                <div class="game-card-icon">
+                    <img src="icons/wrestlebros.png" alt="wrestlebros" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wrestlebros</div>
+            </div>
+</div>
+</div>
+
+<div class="category-section" data-category="racing">
+<div class="games-grid">
+            <div class="game-card" data-category="racing" onclick="playGame('games/blumgiracers.html', 'blumgiracers')">
+                <div class="game-card-icon">
+                    <img src="icons/blumgiracers.png" alt="blumgiracers" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">blumgiracers</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/bouncymotors.html', 'bouncymotors')">
+                <div class="game-card-icon">
+                    <img src="icons/bouncymotors.png" alt="bouncymotors" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bouncymotors</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/cardrawing.html', 'cardrawing')">
+                <div class="game-card-icon">
+                    <img src="icons/cardrawing.png" alt="cardrawing" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">cardrawing</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/carkingarena.html', 'carkingarena')">
+                <div class="game-card-icon">
+                    <img src="icons/carkingarena.png" alt="carkingarena" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">carkingarena</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/crazycars.html', 'crazycars')">
+                <div class="game-card-icon">
+                    <img src="icons/crazycars.png" alt="crazycars" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">crazycars</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/crazymotorcycle.html', 'crazymotorcycle')">
+                <div class="game-card-icon">
+                    <img src="icons/crazymotorcycle.png" alt="crazymotorcycle" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">crazymotorcycle</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/driftboss.htm', 'driftboss')">
+                <div class="game-card-icon">
+                    <img src="icons/driftboss.png" alt="driftboss" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">driftboss</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/eggycar.html', 'eggycar')">
+                <div class="game-card-icon">
+                    <img src="icons/eggycar.png" alt="eggycar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">eggycar</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/highwaytraffic.html', 'highwaytraffic')">
+                <div class="game-card-icon">
+                    <img src="icons/highwaytraffic.png" alt="highwaytraffic" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">highwaytraffic</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/hoverracerdrive.html', 'hoverracerdrive')">
+                <div class="game-card-icon">
+                    <img src="icons/hoverracerdrive.png" alt="hoverracerdrive" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">hoverracerdrive</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/kartbros.html', 'kartbros')">
+                <div class="game-card-icon">
+                    <img src="icons/kartbros.png" alt="kartbros" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">kartbros</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/madalinstuntcars2.html', 'madalinstuntcars2')">
+                <div class="game-card-icon">
+                    <img src="icons/madalinstuntcars2.png" alt="madalinstuntcars2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">madalinstuntcars2</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/mergeroundracers.html', 'mergeroundracers')">
+                <div class="game-card-icon">
+                    <img src="icons/mergeroundracers.png" alt="mergeroundracers" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">mergeroundracers</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/motox3m.htm', 'motox3m')">
+                <div class="game-card-icon">
+                    <img src="icons/motox3m.png" alt="motox3m" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">motox3m</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/motox3m2.html', 'motox3m2')">
+                <div class="game-card-icon">
+                    <img src="icons/motox3m2.png" alt="motox3m2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">motox3m2</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/motox3m3.html', 'motox3m3')">
+                <div class="game-card-icon">
+                    <img src="icons/motox3m3.png" alt="motox3m3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">motox3m3</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/motox3mpoolparty.html', 'motox3mpoolparty')">
+                <div class="game-card-icon">
+                    <img src="icons/motox3mpoolparty.png" alt="motox3mpoolparty" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">motox3mpoolparty</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/motox3mspookyland.html', 'motox3mspookyland')">
+                <div class="game-card-icon">
+                    <img src="icons/motox3mspookyland.png" alt="motox3mspookyland" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">motox3mspookyland</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/motox3mwinter.html', 'motox3mwinter')">
+                <div class="game-card-icon">
+                    <img src="icons/motox3mwinter.png" alt="motox3mwinter" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">motox3mwinter</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/retrohighway.html', 'retrohighway')">
+                <div class="game-card-icon">
+                    <img src="icons/retrohighway.png" alt="retrohighway" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">retrohighway</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/superbikethechampion.html', 'superbikethechampion')">
+                <div class="game-card-icon">
+                    <img src="icons/superbikethechampion.png" alt="superbikethechampion" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">superbikethechampion</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/superstarcar.html', 'superstarcar')">
+                <div class="game-card-icon">
+                    <img src="icons/superstarcar.png" alt="superstarcar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">superstarcar</div>
+            </div>
+            <div class="game-card" data-category="racing" onclick="playGame('games/wheeliebike.html', 'wheeliebike')">
+                <div class="game-card-icon">
+                    <img src="icons/wheeliebike.png" alt="wheeliebike" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wheeliebike</div>
+            </div>
+</div>
+</div>
+
+<div class="category-section" data-category="puzzle">
+<div class="games-grid">
+            <div class="game-card" data-category="puzzle" onclick="playGame('games/blockysnakes.html', 'blockysnakes')">
+                <div class="game-card-icon">
+                    <img src="icons/blockysnakes.png" alt="blockysnakes" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">blockysnakes</div>
+            </div>
+            <div class="game-card" data-category="puzzle" onclick="playGame('games/chess.html', 'chess')">
+                <div class="game-card-icon">
+                    <img src="icons/chess.png" alt="chess" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">chess</div>
+            </div>
+            <div class="game-card" data-category="puzzle" onclick="playGame('games/minesweeper.html', 'minesweeper')">
+                <div class="game-card-icon">
+                    <img src="icons/minesweeper.png" alt="minesweeper" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">minesweeper</div>
+            </div>
+            <div class="game-card" data-category="puzzle" onclick="playGame('games/noobminer.html', 'noobminer')">
+                <div class="game-card-icon">
+                    <img src="icons/noobminer.png" alt="noobminer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">noobminer</div>
+            </div>
+            <div class="game-card" data-category="puzzle" onclick="playGame('games/triviacrack.html', 'triviacrack')">
+                <div class="game-card-icon">
+                    <img src="icons/triviacrack.png" alt="triviacrack" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">triviacrack</div>
+            </div>
+            <div class="game-card" data-category="puzzle" onclick="playGame('games/wordleunlimited.html', 'wordleunlimited')">
+                <div class="game-card-icon">
+                    <img src="icons/wordleunlimited.png" alt="wordleunlimited" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wordleunlimited</div>
+            </div>
+</div>
+</div>
+
+<div class="category-section" data-category="action">
+<div class="games-grid">
+            <div class="game-card" data-category="action" onclick="playGame('games/12minibattles.html', '12minibattles')">
+                <div class="game-card-icon">
+                    <img src="icons/12minibattles.png" alt="12minibattles" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">12minibattles</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/ageofwar.html', 'ageofwar')">
+                <div class="game-card-icon">
+                    <img src="icons/ageofwar.png" alt="ageofwar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ageofwar</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/ageofwar2.html', 'ageofwar2')">
+                <div class="game-card-icon">
+                    <img src="icons/ageofwar2.png" alt="ageofwar2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ageofwar2</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/bowmasters.html', 'bowmasters')">
+                <div class="game-card-icon">
+                    <img src="icons/bowmasters.png" alt="bowmasters" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bowmasters</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/bubbleshooter.html', 'bubbleshooter')">
+                <div class="game-card-icon">
+                    <img src="icons/bubbleshooter.png" alt="bubbleshooter" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bubbleshooter</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/crazycrashlanding.html', 'crazycrashlanding')">
+                <div class="game-card-icon">
+                    <img src="icons/crazycrashlanding.png" alt="crazycrashlanding" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">crazycrashlanding</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/deathrun3D.html', 'deathrun3D')">
+                <div class="game-card-icon">
+                    <img src="icons/deathrun3D.png" alt="deathrun3D" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">deathrun3D</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/demolitionderbycrashracing.html', 'demolitionderbycrashracing')">
+                <div class="game-card-icon">
+                    <img src="icons/demolitionderbycrashracing.png" alt="demolitionderbycrashracing" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">demolitionderbycrashracing</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/escaperoad.html', 'escaperoad')">
+                <div class="game-card-icon">
+                    <img src="icons/escaperoad.png" alt="escaperoad" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">escaperoad</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/escaperoad2.html', 'escaperoad2')">
+                <div class="game-card-icon">
+                    <img src="icons/escaperoad2.png" alt="escaperoad2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">escaperoad2</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/fancypantsadventure.html', 'fancypantsadventure')">
+                <div class="game-card-icon">
+                    <img src="icons/fancypantsadventure.png" alt="fancypantsadventure" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">fancypantsadventure</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/fancypantsadventure2.html', 'fancypantsadventure2')">
+                <div class="game-card-icon">
+                    <img src="icons/fancypantsadventure2.png" alt="fancypantsadventure2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">fancypantsadventure2</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/funnybattle.html', 'funnybattle')">
+                <div class="game-card-icon">
+                    <img src="icons/funnybattle.png" alt="funnybattle" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">funnybattle</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/funnybattle2.html', 'funnybattle2')">
+                <div class="game-card-icon">
+                    <img src="icons/funnybattle2.png" alt="funnybattle2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">funnybattle2</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/funnyshooter2.html', 'funnyshooter2')">
+                <div class="game-card-icon">
+                    <img src="icons/funnyshooter2.png" alt="funnyshooter2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">funnyshooter2</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/pixelspeedrun.html', 'pixelspeedrun')">
+                <div class="game-card-icon">
+                    <img src="icons/pixelspeedrun.png" alt="pixelspeedrun" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">pixelspeedrun</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/plantsvszombies.html', 'plantsvszombies')">
+                <div class="game-card-icon">
+                    <img src="icons/plantsvszombies.png" alt="plantsvszombies" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">plantsvszombies</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/ragdollarchers.htm', 'ragdollarchers')">
+                <div class="game-card-icon">
+                    <img src="icons/ragdollarchers.png" alt="ragdollarchers" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ragdollarchers</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/retrobowl.html', 'retrobowl')">
+                <div class="game-card-icon">
+                    <img src="icons/retrobowl.png" alt="retrobowl" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">retrobowl</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/retrobowlcollege.html', 'retrobowlcollege')">
+                <div class="game-card-icon">
+                    <img src="icons/retrobowlcollege.png" alt="retrobowlcollege" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">retrobowlcollege</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/rooftopsnipers.htm', 'rooftopsnipers')">
+                <div class="game-card-icon">
+                    <img src="icons/rooftopsnipers.png" alt="rooftopsnipers" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">rooftopsnipers</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/rooftopsnipers2.html', 'rooftopsnipers2')">
+                <div class="game-card-icon">
+                    <img src="icons/rooftopsnipers2.png" alt="rooftopsnipers2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">rooftopsnipers2</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/run.html', 'run')">
+                <div class="game-card-icon">
+                    <img src="icons/run.png" alt="run" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">run</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/run2.html', 'run2')">
+                <div class="game-card-icon">
+                    <img src="icons/run2.png" alt="run2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">run2</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/run3.html', 'run3')">
+                <div class="game-card-icon">
+                    <img src="icons/run3.png" alt="run3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">run3</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/sprunki.html', 'sprunki')">
+                <div class="game-card-icon">
+                    <img src="icons/sprunki.png" alt="sprunki" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">sprunki</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/stickarchersbattle.html', 'stickarchersbattle')">
+                <div class="game-card-icon">
+                    <img src="icons/stickarchersbattle.png" alt="stickarchersbattle" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">stickarchersbattle</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/stickfighter.html', 'stickfighter')">
+                <div class="game-card-icon">
+                    <img src="icons/stickfighter.png" alt="stickfighter" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">stickfighter</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/stickmanhook.html', 'stickmanhook')">
+                <div class="game-card-icon">
+                    <img src="icons/stickmanhook.png" alt="stickmanhook" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">stickmanhook</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/stickmerge.html', 'stickmerge')">
+                <div class="game-card-icon">
+                    <img src="icons/stickmerge.png" alt="stickmerge" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">stickmerge</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/timeshooter2.html', 'timeshooter2')">
+                <div class="game-card-icon">
+                    <img src="icons/timeshooter2.png" alt="timeshooter2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">timeshooter2</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/timeshooter3.htm', 'timeshooter3')">
+                <div class="game-card-icon">
+                    <img src="icons/timeshooter3.png" alt="timeshooter3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">timeshooter3</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/wartheknights.html', 'wartheknights')">
+                <div class="game-card-icon">
+                    <img src="icons/wartheknights.png" alt="wartheknights" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wartheknights</div>
+            </div>
+            <div class="game-card" data-category="action" onclick="playGame('games/zombierush.html', 'zombierush')">
+                <div class="game-card-icon">
+                    <img src="icons/zombierush.png" alt="zombierush" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">zombierush</div>
+            </div>
+</div>
+</div>
+
+<div class="category-section" data-category="simulation">
+<div class="games-grid">
+            <div class="game-card" data-category="simulation" onclick="playGame('games/badicecream.html', 'badicecream')">
+                <div class="game-card-icon">
+                    <img src="icons/badicecream.png" alt="badicecream" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">badicecream</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/badicecream2.html', 'badicecream2')">
+                <div class="game-card-icon">
+                    <img src="icons/badicecream2.png" alt="badicecream2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">badicecream2</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/badicecream3.html', 'badicecream3')">
+                <div class="game-card-icon">
+                    <img src="icons/badicecream3.png" alt="badicecream3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">badicecream3</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/bitplanes.htm', 'bitplanes')">
+                <div class="game-card-icon">
+                    <img src="icons/bitplanes.png" alt="bitplanes" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bitplanes</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/cleanupio.html', 'cleanupio')">
+                <div class="game-card-icon">
+                    <img src="icons/cleanupio.png" alt="cleanupio" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">cleanupio</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/crazycattle3D.html', 'crazycattle3D')">
+                <div class="game-card-icon">
+                    <img src="icons/crazycattle3D.png" alt="crazycattle3D" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">crazycattle3D</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/ducklife.html', 'ducklife')">
+                <div class="game-card-icon">
+                    <img src="icons/ducklife.png" alt="ducklife" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ducklife</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/ducklife2.html', 'ducklife2')">
+                <div class="game-card-icon">
+                    <img src="icons/ducklife2.png" alt="ducklife2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ducklife2</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/ducklife3.html', 'ducklife3')">
+                <div class="game-card-icon">
+                    <img src="icons/ducklife3.png" alt="ducklife3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ducklife3</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/ducklife4.html', 'ducklife4')">
+                <div class="game-card-icon">
+                    <img src="icons/ducklife4.png" alt="ducklife4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ducklife4</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/ducklife5.html', 'ducklife5')">
+                <div class="game-card-icon">
+                    <img src="icons/ducklife5.png" alt="ducklife5" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ducklife5</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/ducklingsio.html', 'ducklingsio')">
+                <div class="game-card-icon">
+                    <img src="icons/ducklingsio.png" alt="ducklingsio" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ducklingsio</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/karatebros.html', 'karatebros')">
+                <div class="game-card-icon">
+                    <img src="icons/karatebros.png" alt="karatebros" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">karatebros</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/monkeymart.htm', 'monkeymart')">
+                <div class="game-card-icon">
+                    <img src="icons/monkeymart.png" alt="monkeymart" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">monkeymart</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papasbakeria.html', 'papasbakeria')">
+                <div class="game-card-icon">
+                    <img src="icons/papasbakeria.png" alt="papasbakeria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papasbakeria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papasburgeria.html', 'papasburgeria')">
+                <div class="game-card-icon">
+                    <img src="icons/papasburgeria.png" alt="papasburgeria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papasburgeria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papascheeseria.html', 'papascheeseria')">
+                <div class="game-card-icon">
+                    <img src="icons/papascheeseria.png" alt="papascheeseria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papascheeseria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papascupcakeria.html', 'papascupcakeria')">
+                <div class="game-card-icon">
+                    <img src="icons/papascupcakeria.png" alt="papascupcakeria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papascupcakeria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papasdonuteria.html', 'papasdonuteria')">
+                <div class="game-card-icon">
+                    <img src="icons/papasdonuteria.png" alt="papasdonuteria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papasdonuteria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papasfreezeria.html', 'papasfreezeria')">
+                <div class="game-card-icon">
+                    <img src="icons/papasfreezeria.png" alt="papasfreezeria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papasfreezeria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papashotdoggeria.html', 'papashotdoggeria')">
+                <div class="game-card-icon">
+                    <img src="icons/papashotdoggeria.png" alt="papashotdoggeria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papashotdoggeria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papaspancakeria.html', 'papaspancakeria')">
+                <div class="game-card-icon">
+                    <img src="icons/papaspancakeria.png" alt="papaspancakeria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papaspancakeria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papaspastaria.html', 'papaspastaria')">
+                <div class="game-card-icon">
+                    <img src="icons/papaspastaria.png" alt="papaspastaria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papaspastaria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papaspizzeria.html', 'papaspizzeria')">
+                <div class="game-card-icon">
+                    <img src="icons/papaspizzeria.png" alt="papaspizzeria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papaspizzeria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papasscooperia.html', 'papasscooperia')">
+                <div class="game-card-icon">
+                    <img src="icons/papasscooperia.png" alt="papasscooperia" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papasscooperia</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papassushiria.html', 'papassushiria')">
+                <div class="game-card-icon">
+                    <img src="icons/papassushiria.png" alt="papassushiria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papassushiria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papastacomia.html', 'papastacomia')">
+                <div class="game-card-icon">
+                    <img src="icons/papastacomia.png" alt="papastacomia" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papastacomia</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/papaswingeria.html', 'papaswingeria')">
+                <div class="game-card-icon">
+                    <img src="icons/papaswingeria.png" alt="papaswingeria" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">papaswingeria</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/picosschool.html', 'picosschool')">
+                <div class="game-card-icon">
+                    <img src="icons/picosschool.png" alt="picosschool" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">picosschool</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/poorbunny.html', 'poorbunny')">
+                <div class="game-card-icon">
+                    <img src="icons/poorbunny.png" alt="poorbunny" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">poorbunny</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/riddleschool.html', 'riddleschool')">
+                <div class="game-card-icon">
+                    <img src="icons/riddleschool.png" alt="riddleschool" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">riddleschool</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/riddleschool2.html', 'riddleschool2')">
+                <div class="game-card-icon">
+                    <img src="icons/riddleschool2.png" alt="riddleschool2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">riddleschool2</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/riddleschool3.html', 'riddleschool3')">
+                <div class="game-card-icon">
+                    <img src="icons/riddleschool3.png" alt="riddleschool3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">riddleschool3</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/riddleschool4.html', 'riddleschool4')">
+                <div class="game-card-icon">
+                    <img src="icons/riddleschool4.png" alt="riddleschool4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">riddleschool4</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/riddleschool5.html', 'riddleschool5')">
+                <div class="game-card-icon">
+                    <img src="icons/riddleschool5.png" alt="riddleschool5" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">riddleschool5</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/spacebarclicker.html', 'spacebarclicker')">
+                <div class="game-card-icon">
+                    <img src="icons/spacebarclicker.png" alt="spacebarclicker" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">spacebarclicker</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/spaceiskey.html', 'spaceiskey')">
+                <div class="game-card-icon">
+                    <img src="icons/spaceiskey.png" alt="spaceiskey" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">spaceiskey</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/spaceiskey2.html', 'spaceiskey2')">
+                <div class="game-card-icon">
+                    <img src="icons/spaceiskey2.png" alt="spaceiskey2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">spaceiskey2</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/spacewaves.html', 'spacewaves')">
+                <div class="game-card-icon">
+                    <img src="icons/spacewaves.png" alt="spacewaves" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">spacewaves</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/tinyfishing.html', 'tinyfishing')">
+                <div class="game-card-icon">
+                    <img src="icons/tinyfishing.png" alt="tinyfishing" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">tinyfishing</div>
+            </div>
+            <div class="game-card" data-category="simulation" onclick="playGame('games/trapthecat.html', 'trapthecat')">
+                <div class="game-card-icon">
+                    <img src="icons/trapthecat.png" alt="trapthecat" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">trapthecat</div>
+            </div>
+</div>
+</div>
+
+<div class="category-section" data-category="casual">
+<div class="games-grid">
+            <div class="game-card" data-category="casual" onclick="playGame('games/1.12.html', '1.12')">
+                <div class="game-card-icon">
+                    <img src="icons/1.12.png" alt="1.12" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">1.12</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/1.5.html', '1.5')">
+                <div class="game-card-icon">
+                    <img src="icons/1.5.png" alt="1.5" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">1.5</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/1.8.html', '1.8')">
+                <div class="game-card-icon">
+                    <img src="icons/1.8.png" alt="1.8" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">1.8</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/10minutestilldawn.html', '10minutestilldawn')">
+                <div class="game-card-icon">
+                    <img src="icons/10minutestilldawn.png" alt="10minutestilldawn" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">10minutestilldawn</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/1v1.lol.html', '1v1.lol')">
+                <div class="game-card-icon">
+                    <img src="icons/1v1.lol.png" alt="1v1.lol" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">1v1.lol</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/3Dflightsimulator.html', '3Dflightsimulator')">
+                <div class="game-card-icon">
+                    <img src="icons/3Dflightsimulator.png" alt="3Dflightsimulator" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">3Dflightsimulator</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/8ballclassic.html', '8ballclassic')">
+                <div class="game-card-icon">
+                    <img src="icons/8ballclassic.png" alt="8ballclassic" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">8ballclassic</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/Alpha_1.2.6.html', 'Alpha_1.2.6')">
+                <div class="game-card-icon">
+                    <img src="icons/Alpha_1.2.6.png" alt="Alpha_1.2.6" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">Alpha_1.2.6</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/Beta_1.3.html', 'Beta_1.3')">
+                <div class="game-card-icon">
+                    <img src="icons/Beta_1.3.png" alt="Beta_1.3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">Beta_1.3</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/Indev.html', 'Indev')">
+                <div class="game-card-icon">
+                    <img src="icons/Indev.png" alt="Indev" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">Indev</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/agariolite.html', 'agariolite')">
+                <div class="game-card-icon">
+                    <img src="icons/agariolite.png" alt="agariolite" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">agariolite</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/agesofconflict.html', 'agesofconflict')">
+                <div class="game-card-icon">
+                    <img src="icons/agesofconflict.png" alt="agesofconflict" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">agesofconflict</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/awesometanks.html', 'awesometanks')">
+                <div class="game-card-icon">
+                    <img src="icons/awesometanks.png" alt="awesometanks" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">awesometanks</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/awesometanks2.html', 'awesometanks2')">
+                <div class="game-card-icon">
+                    <img src="icons/awesometanks2.png" alt="awesometanks2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">awesometanks2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/baconmaydie.html', 'baconmaydie')">
+                <div class="game-card-icon">
+                    <img src="icons/baconmaydie.png" alt="baconmaydie" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">baconmaydie</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/badparenting.html', 'badparenting')">
+                <div class="game-card-icon">
+                    <img src="icons/badparenting.png" alt="badparenting" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">badparenting</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/badpiggies.html', 'badpiggies')">
+                <div class="game-card-icon">
+                    <img src="icons/badpiggies.png" alt="badpiggies" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">badpiggies</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/baldisbasics.html', 'baldisbasics')">
+                <div class="game-card-icon">
+                    <img src="icons/baldisbasics.png" alt="baldisbasics" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">baldisbasics</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/bitlife.html', 'bitlife')">
+                <div class="game-card-icon">
+                    <img src="icons/bitlife.png" alt="bitlife" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bitlife</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/bloonsTD.html', 'bloonsTD')">
+                <div class="game-card-icon">
+                    <img src="icons/bloonsTD.png" alt="bloonsTD" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bloonsTD</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/bloonsTD2.html', 'bloonsTD2')">
+                <div class="game-card-icon">
+                    <img src="icons/bloonsTD2.png" alt="bloonsTD2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bloonsTD2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/bloonsTD3.html', 'bloonsTD3')">
+                <div class="game-card-icon">
+                    <img src="icons/bloonsTD3.png" alt="bloonsTD3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bloonsTD3</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/bloonsTD4.html', 'bloonsTD4')">
+                <div class="game-card-icon">
+                    <img src="icons/bloonsTD4.png" alt="bloonsTD4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bloonsTD4</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/bloonsTD5.html', 'bloonsTD5')">
+                <div class="game-card-icon">
+                    <img src="icons/bloonsTD5.png" alt="bloonsTD5" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bloonsTD5</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/bloxorz.html', 'bloxorz')">
+                <div class="game-card-icon">
+                    <img src="icons/bloxorz.png" alt="bloxorz" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bloxorz</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/blumgirocket.html', 'blumgirocket')">
+                <div class="game-card-icon">
+                    <img src="icons/blumgirocket.png" alt="blumgirocket" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">blumgirocket</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/bobtherobber.html', 'bobtherobber')">
+                <div class="game-card-icon">
+                    <img src="icons/bobtherobber.png" alt="bobtherobber" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bobtherobber</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/bobtherobber2.html', 'bobtherobber2')">
+                <div class="game-card-icon">
+                    <img src="icons/bobtherobber2.png" alt="bobtherobber2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bobtherobber2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/bobtherobber5.html', 'bobtherobber5')">
+                <div class="game-card-icon">
+                    <img src="icons/bobtherobber5.png" alt="bobtherobber5" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">bobtherobber5</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/boxingrandom.htm', 'boxingrandom')">
+                <div class="game-card-icon">
+                    <img src="icons/boxingrandom.png" alt="boxingrandom" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">boxingrandom</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/breakingthebank.html', 'breakingthebank')">
+                <div class="game-card-icon">
+                    <img src="icons/breakingthebank.png" alt="breakingthebank" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">breakingthebank</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/capybaraclicker.html', 'capybaraclicker')">
+                <div class="game-card-icon">
+                    <img src="icons/capybaraclicker.png" alt="capybaraclicker" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">capybaraclicker</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/choppyorc.html', 'choppyorc')">
+                <div class="game-card-icon">
+                    <img src="icons/choppyorc.png" alt="choppyorc" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">choppyorc</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/circloO.html', 'circloO')">
+                <div class="game-card-icon">
+                    <img src="icons/circloO.png" alt="circloO" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">circloO</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/circloO2.html', 'circloO2')">
+                <div class="game-card-icon">
+                    <img src="icons/circloO2.png" alt="circloO2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">circloO2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/clashofvikings.html', 'clashofvikings')">
+                <div class="game-card-icon">
+                    <img src="icons/clashofvikings.png" alt="clashofvikings" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">clashofvikings</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/clusterrush.html', 'clusterrush')">
+                <div class="game-card-icon">
+                    <img src="icons/clusterrush.png" alt="clusterrush" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">clusterrush</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/cuttherope.html', 'cuttherope')">
+                <div class="game-card-icon">
+                    <img src="icons/cuttherope.png" alt="cuttherope" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">cuttherope</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/dadish.html', 'dadish')">
+                <div class="game-card-icon">
+                    <img src="icons/dadish.png" alt="dadish" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">dadish</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/dadish2.html', 'dadish2')">
+                <div class="game-card-icon">
+                    <img src="icons/dadish2.png" alt="dadish2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">dadish2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/dadish3.html', 'dadish3')">
+                <div class="game-card-icon">
+                    <img src="icons/dadish3.png" alt="dadish3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">dadish3</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/deathchase.html', 'deathchase')">
+                <div class="game-card-icon">
+                    <img src="icons/deathchase.png" alt="deathchase" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">deathchase</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/drawclimber.html', 'drawclimber')">
+                <div class="game-card-icon">
+                    <img src="icons/drawclimber.png" alt="drawclimber" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">drawclimber</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/dreadheadparkour.htm', 'dreadheadparkour')">
+                <div class="game-card-icon">
+                    <img src="icons/dreadheadparkour.png" alt="dreadheadparkour" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">dreadheadparkour</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/earntodie.html', 'earntodie')">
+                <div class="game-card-icon">
+                    <img src="icons/earntodie.png" alt="earntodie" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">earntodie</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/earntodie2.html', 'earntodie2')">
+                <div class="game-card-icon">
+                    <img src="icons/earntodie2.png" alt="earntodie2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">earntodie2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/elasticface.htm', 'elasticface')">
+                <div class="game-card-icon">
+                    <img src="icons/elasticface.png" alt="elasticface" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">elasticface</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/escapingtheprison.html', 'escapingtheprison')">
+                <div class="game-card-icon">
+                    <img src="icons/escapingtheprison.png" alt="escapingtheprison" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">escapingtheprison</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/evilglitch.html', 'evilglitch')">
+                <div class="game-card-icon">
+                    <img src="icons/evilglitch.png" alt="evilglitch" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">evilglitch</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/fireboyandwatergirl.html', 'fireboyandwatergirl')">
+                <div class="game-card-icon">
+                    <img src="icons/fireboyandwatergirl.png" alt="fireboyandwatergirl" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">fireboyandwatergirl</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/fireboyandwatergirl2.html', 'fireboyandwatergirl2')">
+                <div class="game-card-icon">
+                    <img src="icons/fireboyandwatergirl2.png" alt="fireboyandwatergirl2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">fireboyandwatergirl2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/fireboyandwatergirl3.html', 'fireboyandwatergirl3')">
+                <div class="game-card-icon">
+                    <img src="icons/fireboyandwatergirl3.png" alt="fireboyandwatergirl3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">fireboyandwatergirl3</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/fireboyandwatergirl4.html', 'fireboyandwatergirl4')">
+                <div class="game-card-icon">
+                    <img src="icons/fireboyandwatergirl4.png" alt="fireboyandwatergirl4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">fireboyandwatergirl4</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/fnaf.html', 'fnaf')">
+                <div class="game-card-icon">
+                    <img src="icons/fnaf.png" alt="fnaf" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">fnaf</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/fnaf2.html', 'fnaf2')">
+                <div class="game-card-icon">
+                    <img src="icons/fnaf2.png" alt="fnaf2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">fnaf2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/fnaf3.html', 'fnaf3')">
+                <div class="game-card-icon">
+                    <img src="icons/fnaf3.png" alt="fnaf3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">fnaf3</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/fnaf4.html', 'fnaf4')">
+                <div class="game-card-icon">
+                    <img src="icons/fnaf4.png" alt="fnaf4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">fnaf4</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/freerider3.html', 'freerider3')">
+                <div class="game-card-icon">
+                    <img src="icons/freerider3.png" alt="freerider3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">freerider3</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/funnymadracing.html', 'funnymadracing')">
+                <div class="game-card-icon">
+                    <img src="icons/funnymadracing.png" alt="funnymadracing" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">funnymadracing</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/geometryvibes.html', 'geometryvibes')">
+                <div class="game-card-icon">
+                    <img src="icons/geometryvibes.png" alt="geometryvibes" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">geometryvibes</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/getawayshootout.htm', 'getawayshootout')">
+                <div class="game-card-icon">
+                    <img src="icons/getawayshootout.png" alt="getawayshootout" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">getawayshootout</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/getontop.html', 'getontop')">
+                <div class="game-card-icon">
+                    <img src="icons/getontop.png" alt="getontop" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">getontop</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/gladihoppers.html', 'gladihoppers')">
+                <div class="game-card-icon">
+                    <img src="icons/gladihoppers.png" alt="gladihoppers" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">gladihoppers</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/granny.html', 'granny')">
+                <div class="game-card-icon">
+                    <img src="icons/granny.png" alt="granny" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">granny</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/granny2.html', 'granny2')">
+                <div class="game-card-icon">
+                    <img src="icons/granny2.png" alt="granny2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">granny2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/guesstheiranswer.html', 'guesstheiranswer')">
+                <div class="game-card-icon">
+                    <img src="icons/guesstheiranswer.png" alt="guesstheiranswer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">guesstheiranswer</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/hanger2.html', 'hanger2')">
+                <div class="game-card-icon">
+                    <img src="icons/hanger2.png" alt="hanger2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">hanger2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/happywheels.html', 'happywheels')">
+                <div class="game-card-icon">
+                    <img src="icons/happywheels.png" alt="happywheels" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">happywheels</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/helixjump.html', 'helixjump')">
+                <div class="game-card-icon">
+                    <img src="icons/helixjump.png" alt="helixjump" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">helixjump</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/hillclimbracinglite.html', 'hillclimbracinglite')">
+                <div class="game-card-icon">
+                    <img src="icons/hillclimbracinglite.png" alt="hillclimbracinglite" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">hillclimbracinglite</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/holeio.html', 'holeio')">
+                <div class="game-card-icon">
+                    <img src="icons/holeio.png" alt="holeio" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">holeio</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/houseofhazards.html', 'houseofhazards')">
+                <div class="game-card-icon">
+                    <img src="icons/houseofhazards.png" alt="houseofhazards" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">houseofhazards</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/idlebreakout.html', 'idlebreakout')">
+                <div class="game-card-icon">
+                    <img src="icons/idlebreakout.png" alt="idlebreakout" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">idlebreakout</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/ironsnout.html', 'ironsnout')">
+                <div class="game-card-icon">
+                    <img src="icons/ironsnout.png" alt="ironsnout" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ironsnout</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/jetpackjoyride.html', 'jetpackjoyride')">
+                <div class="game-card-icon">
+                    <img src="icons/jetpackjoyride.png" alt="jetpackjoyride" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">jetpackjoyride</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/johnnytrigger.html', 'johnnytrigger')">
+                <div class="game-card-icon">
+                    <img src="icons/johnnytrigger.png" alt="johnnytrigger" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">johnnytrigger</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/jumpingshell.html', 'jumpingshell')">
+                <div class="game-card-icon">
+                    <img src="icons/jumpingshell.png" alt="jumpingshell" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">jumpingshell</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/learntofly.html', 'learntofly')">
+                <div class="game-card-icon">
+                    <img src="icons/learntofly.png" alt="learntofly" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">learntofly</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/learntofly2.html', 'learntofly2')">
+                <div class="game-card-icon">
+                    <img src="icons/learntofly2.png" alt="learntofly2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">learntofly2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/learntofly3.html', 'learntofly3')">
+                <div class="game-card-icon">
+                    <img src="icons/learntofly3.png" alt="learntofly3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">learntofly3</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/learntoflyidle.html', 'learntoflyidle')">
+                <div class="game-card-icon">
+                    <img src="icons/learntoflyidle.png" alt="learntoflyidle" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">learntoflyidle</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/leveldevil.html', 'leveldevil')">
+                <div class="game-card-icon">
+                    <img src="icons/leveldevil.png" alt="leveldevil" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">leveldevil</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/melonplayground.html', 'melonplayground')">
+                <div class="game-card-icon">
+                    <img src="icons/melonplayground.png" alt="melonplayground" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">melonplayground</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/monstertracks.html', 'monstertracks')">
+                <div class="game-card-icon">
+                    <img src="icons/monstertracks.png" alt="monstertracks" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">monstertracks</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/oppositeday.html', 'oppositeday')">
+                <div class="game-card-icon">
+                    <img src="icons/oppositeday.png" alt="oppositeday" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">oppositeday</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/ovo.html', 'ovo')">
+                <div class="game-card-icon">
+                    <img src="icons/ovo.png" alt="ovo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ovo</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/ovo2.html', 'ovo2')">
+                <div class="game-card-icon">
+                    <img src="icons/ovo2.png" alt="ovo2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ovo2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/ovo3dimensions.html', 'ovo3dimensions')">
+                <div class="game-card-icon">
+                    <img src="icons/ovo3dimensions.png" alt="ovo3dimensions" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ovo3dimensions</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/pacman.html', 'pacman')">
+                <div class="game-card-icon">
+                    <img src="icons/pacman.png" alt="pacman" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">pacman</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/paperio2.htm', 'paperio2')">
+                <div class="game-card-icon">
+                    <img src="icons/paperio2.png" alt="paperio2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">paperio2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/parkingfury.html', 'parkingfury')">
+                <div class="game-card-icon">
+                    <img src="icons/parkingfury.png" alt="parkingfury" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">parkingfury</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/parkingfury2.html', 'parkingfury2')">
+                <div class="game-card-icon">
+                    <img src="icons/parkingfury2.png" alt="parkingfury2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">parkingfury2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/parkingfury3.html', 'parkingfury3')">
+                <div class="game-card-icon">
+                    <img src="icons/parkingfury3.png" alt="parkingfury3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">parkingfury3</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/plonky.html', 'plonky')">
+                <div class="game-card-icon">
+                    <img src="icons/plonky.png" alt="plonky" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">plonky</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/polytrack.html', 'polytrack')">
+                <div class="game-card-icon">
+                    <img src="icons/polytrack.png" alt="polytrack" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">polytrack</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/pou.html', 'pou')">
+                <div class="game-card-icon">
+                    <img src="icons/pou.png" alt="pou" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">pou</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/ragdollhit.html', 'ragdollhit')">
+                <div class="game-card-icon">
+                    <img src="icons/ragdollhit.png" alt="ragdollhit" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">ragdollhit</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/redball4vol1.html', 'redball4vol1')">
+                <div class="game-card-icon">
+                    <img src="icons/redball4vol1.png" alt="redball4vol1" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">redball4vol1</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/redball4vol2.html', 'redball4vol2')">
+                <div class="game-card-icon">
+                    <img src="icons/redball4vol2.png" alt="redball4vol2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">redball4vol2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/redball4vol3.html', 'redball4vol3')">
+                <div class="game-card-icon">
+                    <img src="icons/redball4vol3.png" alt="redball4vol3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">redball4vol3</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/riddletransfer.html', 'riddletransfer')">
+                <div class="game-card-icon">
+                    <img src="icons/riddletransfer.png" alt="riddletransfer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">riddletransfer</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/riddletransfer2.html', 'riddletransfer2')">
+                <div class="game-card-icon">
+                    <img src="icons/riddletransfer2.png" alt="riddletransfer2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">riddletransfer2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/sandgame.html', 'sandgame')">
+                <div class="game-card-icon">
+                    <img src="icons/sandgame.png" alt="sandgame" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">sandgame</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/shortlife.html', 'shortlife')">
+                <div class="game-card-icon">
+                    <img src="icons/shortlife.png" alt="shortlife" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">shortlife</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/slope.html', 'slope')">
+                <div class="game-card-icon">
+                    <img src="icons/slope.png" alt="slope" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">slope</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/slope2player.html', 'slope2player')">
+                <div class="game-card-icon">
+                    <img src="icons/slope2player.png" alt="slope2player" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">slope2player</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/slope3.html', 'slope3')">
+                <div class="game-card-icon">
+                    <img src="icons/slope3.png" alt="slope3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">slope3</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/slowroads.html', 'slowroads')">
+                <div class="game-card-icon">
+                    <img src="icons/slowroads.png" alt="slowroads" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">slowroads</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/sm63.html', 'sm63')">
+                <div class="game-card-icon">
+                    <img src="icons/sm63.png" alt="sm63" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">sm63</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/sm64.html', 'sm64')">
+                <div class="game-card-icon">
+                    <img src="icons/sm64.png" alt="sm64" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">sm64</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/speedstars.html', 'speedstars')">
+                <div class="game-card-icon">
+                    <img src="icons/speedstars.png" alt="speedstars" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">speedstars</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/stack.html', 'stack')">
+                <div class="game-card-icon">
+                    <img src="icons/stack.png" alt="stack" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">stack</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/stacktris.html', 'stacktris')">
+                <div class="game-card-icon">
+                    <img src="icons/stacktris.png" alt="stacktris" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">stacktris</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/stateio.html', 'stateio')">
+                <div class="game-card-icon">
+                    <img src="icons/stateio.png" alt="stateio" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">stateio</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/superhot.html', 'superhot')">
+                <div class="game-card-icon">
+                    <img src="icons/superhot.png" alt="superhot" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">superhot</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/tag.html', 'tag')">
+                <div class="game-card-icon">
+                    <img src="icons/tag.png" alt="tag" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">tag</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/taproad.html', 'taproad')">
+                <div class="game-card-icon">
+                    <img src="icons/taproad.png" alt="taproad" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">taproad</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/territorialio.html', 'territorialio')">
+                <div class="game-card-icon">
+                    <img src="icons/territorialio.png" alt="territorialio" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">territorialio</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/theimpossiblequiz.html', 'theimpossiblequiz')">
+                <div class="game-card-icon">
+                    <img src="icons/theimpossiblequiz.png" alt="theimpossiblequiz" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">theimpossiblequiz</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/theimpossiblequiz2.html', 'theimpossiblequiz2')">
+                <div class="game-card-icon">
+                    <img src="icons/theimpossiblequiz2.png" alt="theimpossiblequiz2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">theimpossiblequiz2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/thereisnog.html', 'thereisnog')">
+                <div class="game-card-icon">
+                    <img src="icons/thereisnog.png" alt="thereisnog" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">thereisnog</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/theyarecoming.html', 'theyarecoming')">
+                <div class="game-card-icon">
+                    <img src="icons/theyarecoming.png" alt="theyarecoming" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">theyarecoming</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/thisistheonlylevel.html', 'thisistheonlylevel')">
+                <div class="game-card-icon">
+                    <img src="icons/thisistheonlylevel.png" alt="thisistheonlylevel" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">thisistheonlylevel</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/thisistheonlyleveltoo.html', 'thisistheonlyleveltoo')">
+                <div class="game-card-icon">
+                    <img src="icons/thisistheonlyleveltoo.png" alt="thisistheonlyleveltoo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">thisistheonlyleveltoo</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/tombofthemask.htm', 'tombofthemask')">
+                <div class="game-card-icon">
+                    <img src="icons/tombofthemask.png" alt="tombofthemask" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">tombofthemask</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/tubejumpers.html', 'tubejumpers')">
+                <div class="game-card-icon">
+                    <img src="icons/tubejumpers.png" alt="tubejumpers" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">tubejumpers</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/tunnelrush.html', 'tunnelrush')">
+                <div class="game-card-icon">
+                    <img src="icons/tunnelrush.png" alt="tunnelrush" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">tunnelrush</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/unicyclehero.html', 'unicyclehero')">
+                <div class="game-card-icon">
+                    <img src="icons/unicyclehero.png" alt="unicyclehero" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">unicyclehero</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/volleyrandom.html', 'volleyrandom')">
+                <div class="game-card-icon">
+                    <img src="icons/volleyrandom.png" alt="volleyrandom" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">volleyrandom</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/webecomewhatwebehold.html', 'webecomewhatwebehold')">
+                <div class="game-card-icon">
+                    <img src="icons/webecomewhatwebehold.png" alt="webecomewhatwebehold" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">webecomewhatwebehold</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/wheely.html', 'wheely')">
+                <div class="game-card-icon">
+                    <img src="icons/wheely.png" alt="wheely" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wheely</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/wheely2.html', 'wheely2')">
+                <div class="game-card-icon">
+                    <img src="icons/wheely2.png" alt="wheely2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wheely2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/wheely3.html', 'wheely3')">
+                <div class="game-card-icon">
+                    <img src="icons/wheely3.png" alt="wheely3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wheely3</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/wheely4.html', 'wheely4')">
+                <div class="game-card-icon">
+                    <img src="icons/wheely4.png" alt="wheely4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wheely4</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/wheely5.html', 'wheely5')">
+                <div class="game-card-icon">
+                    <img src="icons/wheely5.png" alt="wheely5" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wheely5</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/wheely6.html', 'wheely6')">
+                <div class="game-card-icon">
+                    <img src="icons/wheely6.png" alt="wheely6" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wheely6</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/wheely7.html', 'wheely7')">
+                <div class="game-card-icon">
+                    <img src="icons/wheely7.png" alt="wheely7" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wheely7</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/wheely8.html', 'wheely8')">
+                <div class="game-card-icon">
+                    <img src="icons/wheely8.png" alt="wheely8" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">wheely8</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/worldshardestgame.html', 'worldshardestgame')">
+                <div class="game-card-icon">
+                    <img src="icons/worldshardestgame.png" alt="worldshardestgame" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">worldshardestgame</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/worldshardestgame2.html', 'worldshardestgame2')">
+                <div class="game-card-icon">
+                    <img src="icons/worldshardestgame2.png" alt="worldshardestgame2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">worldshardestgame2</div>
+            </div>
+            <div class="game-card" data-category="casual" onclick="playGame('games/worldshardestgame3.html', 'worldshardestgame3')">
+                <div class="game-card-icon">
+                    <img src="icons/worldshardestgame3.png" alt="worldshardestgame3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="game-card-title">worldshardestgame3</div>
+            </div>
+</div>
+</div>
+
+</section>
+
+    <footer class="footer" id="about">
+        <p class="footer-text">Made in My ❤</p>
+    </footer>
+
+    <div class="particles" id="particles"></div>
+    <div class="stars" id="stars"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            createStars();
+        });
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const colors = [
+                'rgba(255, 45, 149, 0.8)', 'rgba(0, 243, 255, 0.8)',
+                'rgba(188, 19, 254, 0.8)', 'rgba(57, 255, 20, 0.6)',
+                'rgba(255, 230, 0, 0.6)'
+            ];
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 4 + 2;
+                particle.style.cssText = `
+                    width: ${size}px; height: ${size}px;
+                    left: ${Math.random() * 100}%;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    animation-duration: ${Math.random() * 15 + 10}s;
+                    animation-delay: ${Math.random() * 10}s;
+                    box-shadow: 0 0 ${size * 2}px currentColor;
+                `;
+                container.appendChild(particle);
+            }
+        }
+
+        function createStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.cssText = `
+                    left: ${Math.random() * 100}%; top: ${Math.random() * 100}%;
+                    animation-duration: ${Math.random() * 3 + 1}s;
+                    animation-delay: ${Math.random() * 3}s;
+                `;
+                container.appendChild(star);
+            }
+        }
+
+        function playGame(url, title) {
+            window.open(url, '_blank');
+        }
+
+        function filterGames() {
+            const query = document.getElementById('game-search').value.toLowerCase();
+            const cards = document.querySelectorAll('.game-card');
+            const sections = document.querySelectorAll('.category-section');
+            
+            if (query === '') {
+                // 搜索框为空：恢复只显示默认分类
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    const cards = section.querySelectorAll('.game-card');
+                    cards.forEach(card => card.style.display = '');
+                });
+                // 恢复默认：只显示 Popular
+                const popular = document.querySelector('.category-section[data-category="popular"]');
+                if (popular) popular.classList.add('active');
+                // 恢复标签高亮
+                document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+                document.querySelector('.category-tag').classList.add('active');
+            } else {
+                // 搜索中有文字：显示所有分类区块，只显示匹配的游戏
+                sections.forEach(section => section.classList.add('active'));
+                cards.forEach(card => {
+                    const title = card.querySelector('.game-card-title').textContent.toLowerCase();
+                    card.style.display = title.includes(query) ? '' : 'none';
+                });
+                // 搜索时取消标签高亮
+                document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+            }
+        }
+
+        function filterCategory(cat, el) {
+            document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            // 显示/隐藏对应的分类区块
+            document.querySelectorAll('.category-section').forEach(section => {
+                section.classList.remove('active');
+                const sectionCat = section.getAttribute('data-category');
+                if (sectionCat === cat) {
+                    section.classList.add('active');
+                }
+            });
+            // 恢复当前分类区块内的所有游戏卡片
+            const activeSection = document.querySelector('.category-section[data-category="' + cat + '"]');
+            if (activeSection) {
+                const cards = activeSection.querySelectorAll('.game-card');
+                cards.forEach(card => card.style.display = '');
+            }
+        }
+
+        function resetCategories() {
+            document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+            document.querySelector('.category-tag').classList.add('active');
+        }
+    </script>
+</body>
+</html>
